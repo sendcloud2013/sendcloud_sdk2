@@ -2,12 +2,13 @@ package com.sendcloud.sdk;
 
 import java.io.IOException;
 
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 
 import com.sendcloud.sdk.builder.SendCloudBuilder;
-import com.sendcloud.sdk.config.Credential;
 import com.sendcloud.sdk.core.SendCloud;
 import com.sendcloud.sdk.exception.SmsException;
+import com.sendcloud.sdk.exception.VoiceException;
 import com.sendcloud.sdk.model.SendCloudSms;
 import com.sendcloud.sdk.util.ResponseData;
 
@@ -15,20 +16,19 @@ import net.sf.json.JSONObject;
 
 public class SmsTest {
 
-	public static void main(String[] args) throws ClientProtocolException, IOException, SmsException {
-		// TODO Auto-generated method stub
+	public static void main(String[] args)
+			throws ClientProtocolException, IOException, SmsException, ParseException, VoiceException {
 		SendCloud sc = SendCloudBuilder.build();
-		Credential cr = new Credential("sms user", "sms key");
 
 		SendCloudSms sms = new SendCloudSms();
-		sms.setMsgType(0);
-		sms.setTemplateId(1);
-		sms.addPhone("15527869841");
-		sms.addVars("code", "654321");
+		sms.setTemplateId(65825);
+		sms.addPhone("13512345678");
+		sms.addVars("code", "123456");
 
-		ResponseData result = sc.sendSms(cr, sms);
+		ResponseData result = sc.sendSms(sms);
 
 		System.out.println(JSONObject.fromObject(result).toString());
+
 	}
 
 }

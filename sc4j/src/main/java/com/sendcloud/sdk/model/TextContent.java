@@ -36,7 +36,11 @@ public class TextContent implements Content {
 	 * 默认text/html
 	 * </pre>
 	 */
-	private String content_type = "text/html";
+	public enum ScContentType {
+		html, plain
+	}
+
+	private ScContentType content_type = ScContentType.html;
 
 	public String getText() {
 		return text;
@@ -46,7 +50,7 @@ public class TextContent implements Content {
 		this.text = text;
 	}
 
-	public String getContent_type() {
+	public ScContentType getContent_type() {
 		return content_type;
 	}
 
@@ -55,16 +59,13 @@ public class TextContent implements Content {
 	 * 
 	 * @param content_type
 	 */
-	public void setContent_type(String content_type) {
+	public void setContent_type(ScContentType content_type) {
 		this.content_type = content_type;
 	}
 
 	public boolean validate() throws ContentException {
 		if (StringUtils.isBlank(text))
 			throw new ContentException("邮件内容为空");
-		if (!StringUtils.equals(content_type, Config.CONTENT_TYPE_HTML)
-				&& !StringUtils.equals(content_type, Config.CONTENT_TYPE_PLAIN))
-			throw new ContentException("邮件content type不正确");
 		if (text.length() > Config.MAX_CONTENT_SIZE)
 			throw new ContentException("邮件内容过长");
 		return true;

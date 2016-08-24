@@ -39,6 +39,7 @@ import com.sendcloud.sdk.model.SendCloudSms;
 import com.sendcloud.sdk.model.SendCloudVoice;
 import com.sendcloud.sdk.model.TemplateContent;
 import com.sendcloud.sdk.model.TextContent;
+import com.sendcloud.sdk.model.TextContent.ScContentType;
 import com.sendcloud.sdk.util.Md5Util;
 import com.sendcloud.sdk.util.ResponseData;
 
@@ -61,13 +62,14 @@ import net.sf.json.util.JSONUtils;
  * body.setFromName("张三");
  * body.setReplyTo("service@qq.com");
  * body.setSubject("测试");
- * // 创建附件
+ * // 创建文件附件
+ * body.addAttachments(new File("D:/test.txt"));
+ * // 创建流附件
  * body.addAttachments(new FileInputStream(new File("D:/ff.png")));
- * 
  * // 邮箱收件人
  * MailAddressReceiver receiver = new MailAddressReceiver();
  * receiver.setBroadcastSend(true);// 广播发送(收件人会全部显示)
- * receiver.addTo("37441185@qq.com");
+ * receiver.addTo("1234@qq.com");
  * 
  * // 地址列表收件人
  * // MailListReceiver receiver=new MailListReceiver();
@@ -76,23 +78,21 @@ import net.sf.json.util.JSONUtils;
  * 
  * // 创建模版邮件内容
  * TemplateContent content = new TemplateContent();
- * content.setTemplateInvokeName("kolui");
+ * content.setTemplateInvokeName("templateInvokeName");
  * 
  * // 创建文本邮件内容
- * // TextContent content=new TextContent();
- * // content.setContent_type("text/html");
+ * // TextContent content = new TextContent();
+ * // content.setContent_type(ScContentType.html);
  * // content.setText("hello world");
  * 
  * // 创建邮件
- * SendCloudMail smail = new SendCloudMail();
- * smail.setBody(body);
- * smail.setContent(content);
- * smail.setTo(receiver);
- * 
- * Credential cr = new Credential("user", "key");
+ * SendCloudMail scmail = new SendCloudMail();
+ * scmail.setBody(body);
+ * scmail.setContent(content);
+ * scmail.setTo(receiver);
  * 
  * // 发信
- * ResponseData result = sc.sendMail(cr, smail);
+ * ResponseData result = sc.sendMail(scmail);
  * System.out.println(JSONObject.fromObject(result).toString());
  * </pre>
  * 
@@ -107,15 +107,13 @@ import net.sf.json.util.JSONUtils;
  * 
  * <pre>
  * SendCloud sc = SendCloudBuilder.build();
- * Credential cr = new Credential("sms user", "sms key");
  * 
  * SendCloudSms sms = new SendCloudSms();
- * sms.setMsgType(0);
- * sms.setTemplateId(1);
+ * sms.setTemplateId(65825);
  * sms.addPhone("13512345678");
  * sms.addVars("code", "123456");
  * 
- * ResponseData result = sc.sendSms(cr, sms);
+ * ResponseData result = sc.sendSms(sms);
  * 
  * System.out.println(JSONObject.fromObject(result).toString());
  * </pre>
@@ -129,13 +127,12 @@ import net.sf.json.util.JSONUtils;
  * 
  * <pre>
  * SendCloud sc = SendCloudBuilder.build();
- * Credential cr = new Credential("sms user", "sms key");
  * 
  * SendCloudVoice sms = new SendCloudVoice();
- * sms.setPhone("13512345678");
+ * sms.setPhone("13312345678");
  * sms.setCode("1234");
  * 
- * ResponseData result = sc.sendVoice(cr, sms);
+ * ResponseData result = sc.sendVoice(sms);
  * 
  * System.out.println(JSONObject.fromObject(result).toString());
  * </pre>
@@ -202,14 +199,16 @@ public class SendCloud {
 	 * @param mail
 	 *            邮件
 	 */
-	public ResponseData sendMail(Credential credential, SendCloudMail mail) throws Throwable {
-		Asserts.notNull(credential, "credential");
+	public ResponseData sendMail(SendCloudMail mail) throws Throwable {
 		Asserts.notNull(mail, "mail");
+		Asserts.notBlank(Config.api_user, "api_user");
+		Asserts.notBlank(Config.api_key, "api_key");
 		mail.validate();
+		Credential credential = new Credential(Config.api_user, Config.api_key);
 		if (CollectionUtils.isEmpty(mail.getBody().getAttachments())) {
 			return post(credential, mail);
 		} else {
-			return MultipartPost(credential, mail);
+			return multipartPost(credential, mail);
 		}
 	}
 
@@ -241,7 +240,7 @@ public class SendCloud {
 			params.add(new BasicNameValuePair("templateInvokeName", content.getTemplateInvokeName()));
 		} else {
 			TextContent content = (TextContent) mail.getContent();
-			if (content.getContent_type().equals(Config.CONTENT_TYPE_HTML)) {
+			if (content.getContent_type().equals(ScContentType.html)) {
 				params.add(new BasicNameValuePair("html", content.getText()));
 			} else {
 				params.add(new BasicNameValuePair("plain", content.getText()));
@@ -289,7 +288,7 @@ public class SendCloud {
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	private ResponseData MultipartPost(Credential credential, SendCloudMail mail)
+	private ResponseData multipartPost(Credential credential, SendCloudMail mail)
 			throws ClientProtocolException, IOException {
 		HttpPost httpPost = new HttpPost(mail.getContent().useTemplate() ? templateAPI : mailAPI);
 		CloseableHttpClient httpclient = HttpClientBuilder.create().build();
@@ -315,7 +314,7 @@ public class SendCloud {
 			entity.addTextBody("templateInvokeName", content.getTemplateInvokeName(), TEXT_PLAIN);
 		} else {
 			TextContent content = (TextContent) mail.getContent();
-			if (content.getContent_type().equals(Config.CONTENT_TYPE_HTML)) {
+			if (content.getContent_type().equals(ScContentType.html)) {
 				entity.addTextBody("html", content.getText(), TEXT_PLAIN);
 			} else {
 				entity.addTextBody("plain", content.getText(), TEXT_PLAIN);
@@ -372,12 +371,12 @@ public class SendCloud {
 	 * @throws IOException
 	 * @throws SmsException
 	 */
-	public ResponseData sendSms(Credential credential, SendCloudSms sms)
-			throws ClientProtocolException, IOException, SmsException {
-		Asserts.notNull(credential, "credential");
+	public ResponseData sendSms(SendCloudSms sms) throws ClientProtocolException, IOException, SmsException {
 		Asserts.notNull(sms, "sms");
+		Asserts.notBlank(Config.sms_user, "sms_user");
+		Asserts.notBlank(Config.sms_key, "sms_key");
 		sms.validate();
-
+		Credential credential = new Credential(Config.sms_user, Config.sms_key);
 		TreeMap<String, String> treeMap = new TreeMap<String, String>();
 		treeMap.put("smsUser", credential.getApiUser());
 		treeMap.put("msgType", sms.getMsgType().toString());
@@ -416,11 +415,12 @@ public class SendCloud {
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public ResponseData sendVoice(Credential credential, SendCloudVoice voice)
-			throws VoiceException, ParseException, IOException {
-		Asserts.notNull(credential, "credential");
+	public ResponseData sendVoice(SendCloudVoice voice) throws VoiceException, ParseException, IOException {
 		Asserts.notNull(voice, "voice");
+		Asserts.notBlank(Config.sms_user, "sms_user");
+		Asserts.notBlank(Config.sms_key, "sms_key");
 		voice.validate();
+		Credential credential = new Credential(Config.sms_user, Config.sms_key);
 		TreeMap<String, String> treeMap = new TreeMap<String, String>();
 		treeMap.put("smsUser", credential.getApiUser());
 		treeMap.put("phone", voice.getPhone());
