@@ -460,17 +460,18 @@ public class SendCloud {
 		if (JSONUtils.mayBeJSON(s)) {
 			JSONObject json = JSONObject.fromObject(s);
 			if (json.containsKey("statusCode")) {
-				result.setCode(json.getInt("statusCode"));
+				result.setStatusCode(json.getInt("statusCode"));
 				result.setMessage(json.getString("message"));
-				result.setSuccess(json.getBoolean("result"));
+				result.setResult(json.getBoolean("result"));
+				result.setInfo(json.getJSONObject("info").toString());
 			} else {
-				result.setCode(500);
+				result.setStatusCode(500);
 				result.setMessage(json.toString());
 			}
 		} else {
-			result.setCode(response.getStatusLine().getStatusCode());
+			result.setStatusCode(response.getStatusLine().getStatusCode());
 			result.setMessage("发送失败");
-			result.setSuccess(false);
+			result.setResult(false);
 		}
 		return result;
 	}

@@ -2,25 +2,10 @@ package com.sendcloud.sdk.util;
 
 public class ResponseData {
 
-	public boolean success;
-	public int code;
+	public boolean result;
+	public int statusCode;
 	public String message;
-
-	public boolean isSuccess() {
-		return success;
-	}
-
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public void setCode(int code) {
-		this.code = code;
-	}
+	public String info;
 
 	public String getMessage() {
 		return message;
@@ -28,6 +13,30 @@ public class ResponseData {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public boolean isResult() {
+		return result;
+	}
+
+	public void setResult(boolean result) {
+		this.result = result;
+	}
+
+	public int getStatusCode() {
+		return statusCode;
+	}
+
+	public void setStatusCode(int statusCode) {
+		this.statusCode = statusCode;
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 
 }
