@@ -1,6 +1,7 @@
 package com.sendcloud.sdk.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -49,22 +50,22 @@ public class MailAddressReceiver implements Receiver {
 	public void addTo(String address) {
 		if (to == null)
 			to = new ArrayList<String>();
-		to.add(address);
+		to.addAll(Arrays.asList(address.split(";")));
 	}
 
 	public void addCc(String address) {
 		if (cc == null)
 			cc = new ArrayList<String>();
-		cc.add(address);
+
+		cc.addAll(Arrays.asList(address.split(";")));
 	}
 
 	public void addBcc(String address) {
 		if (bcc == null)
 			bcc = new ArrayList<String>();
-		bcc.add(address);
+		bcc.addAll(Arrays.asList(address.split(";")));
 	}
 
-	
 	public boolean isBroadcastSend() {
 		return broadcastSend;
 	}

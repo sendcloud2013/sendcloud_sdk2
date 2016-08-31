@@ -1,11 +1,17 @@
 package com.sendcloud.sdk.util;
 
+import net.sf.json.JSONObject;
+
 public class ResponseData {
 
 	public boolean result;
 	public int statusCode;
 	public String message;
 	public String info;
+
+	public String toString() {
+		return JSONObject.fromObject(this).toString();
+	}
 
 	public String getMessage() {
 		return message;
@@ -15,7 +21,7 @@ public class ResponseData {
 		this.message = message;
 	}
 
-	public boolean isResult() {
+	public boolean getResult() {
 		return result;
 	}
 

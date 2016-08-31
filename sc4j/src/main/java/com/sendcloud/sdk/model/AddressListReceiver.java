@@ -1,6 +1,7 @@
 package com.sendcloud.sdk.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -14,7 +15,7 @@ import com.sendcloud.sdk.exception.ReceiverException;
  * @author SendCloud
  *
  */
-public class MailListReceiver implements Receiver {
+public class AddressListReceiver implements Receiver {
 
 	public boolean useAddressList() {
 		return true;
@@ -23,27 +24,32 @@ public class MailListReceiver implements Receiver {
 	/**
 	 * 地址列表
 	 */
-	private List<String> mailList = new ArrayList<String>();
+	private List<String> invokeNames = new ArrayList<String>();
 
-	public List<String> getMailList() {
-		return mailList;
+	public List<String> getInvokeNames() {
+		return invokeNames;
 	}
 
-	public void addMailList(String maillist) {
-		mailList.add(maillist);
+	/**
+	 * 增加地址列表的调用名称
+	 * 
+	 * @param to
+	 */
+	public void addTo(String to) {
+		invokeNames.addAll(Arrays.asList(to.split(";")));
 	}
 
 	public boolean validate() throws ReceiverException {
-		if (CollectionUtils.isEmpty(mailList))
+		if (CollectionUtils.isEmpty(invokeNames))
 			throw new ReceiverException("地址列表为空");
-		if (mailList.size() > Config.MAX_MAILLIST)
+		if (invokeNames.size() > Config.MAX_MAILLIST)
 			throw new ReceiverException("地址列表超过上限");
 		return true;
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for (String address : mailList) {
+		for (String address : invokeNames) {
 			if (sb.length() > 0)
 				sb.append(";");
 			sb.append(address);

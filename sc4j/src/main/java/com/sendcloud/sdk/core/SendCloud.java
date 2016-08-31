@@ -259,7 +259,9 @@ public class SendCloud {
 				params.add(new BasicNameValuePair("cc", receiver.getCcString()));
 				params.add(new BasicNameValuePair("bcc", receiver.getBccString()));
 			} else {
-				mail.getBody().addXsmtpapi("to", JSONArray.fromObject(receiver.getTo()));
+				if (mail.getBody().getXsmtpapi() != null && !mail.getBody().getXsmtpapi().containsKey("to")) {
+					mail.getBody().addXsmtpapi("to", JSONArray.fromObject(receiver.getTo()));
+				}
 			}
 		}
 		if (MapUtils.isNotEmpty(mail.getBody().getHeaders()))
@@ -328,6 +330,7 @@ public class SendCloud {
 			entity.addTextBody("to", mail.getTo().toString(), TEXT_PLAIN);
 		} else {
 			MailAddressReceiver receiver = (MailAddressReceiver) mail.getTo();
+
 			if (!mail.getContent().useTemplate() && receiver.isBroadcastSend()) {
 				entity.addTextBody("to", receiver.toString(), TEXT_PLAIN);
 				if (StringUtils.isNotEmpty(receiver.getCcString()))
@@ -335,7 +338,9 @@ public class SendCloud {
 				if (StringUtils.isNotEmpty(receiver.getBccString()))
 					entity.addTextBody("bcc", receiver.getBccString(), TEXT_PLAIN);
 			} else {
-				mail.getBody().addXsmtpapi("to", JSONArray.fromObject(receiver.getTo()));
+				if (mail.getBody().getXsmtpapi() == null || !mail.getBody().getXsmtpapi().containsKey("to")) {
+					mail.getBody().addXsmtpapi("to", JSONArray.fromObject(receiver.getTo()));
+				}
 			}
 		}
 		if (MapUtils.isNotEmpty(mail.getBody().getHeaders()))

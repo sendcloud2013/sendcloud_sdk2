@@ -48,8 +48,14 @@ public class SendCloudMail {
 	public void validate() throws Throwable {
 		Asserts.notNull(body, "body");
 		body.validate();
-		Asserts.notNull(to, "to");
-		to.validate();
+		if (!this.getContent().useTemplate()) {
+			Asserts.notNull(to, "to");
+			to.validate();
+		} else {
+			if (to != null) {
+				to.validate();
+			}
+		}
 		Asserts.notNull(content, "content");
 		content.validate();
 	}
