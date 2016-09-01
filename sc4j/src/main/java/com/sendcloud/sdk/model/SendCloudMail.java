@@ -8,8 +8,8 @@ import org.apache.http.util.Asserts;
  * <P>
  * <OL>
  * <LI><B>body</B> 邮件，必须
- * <LI><B>to</B> 收件人，必须
  * <LI><B>content</B> 邮件内容，必须
+ * <LI><B>to</B> 收件人，非必须(可以在xsmtpapi中添加)
  * </OL>
  * <P>
  * 
@@ -48,15 +48,9 @@ public class SendCloudMail {
 	public void validate() throws Throwable {
 		Asserts.notNull(body, "body");
 		body.validate();
-		if (!this.getContent().useTemplate()) {
-			Asserts.notNull(to, "to");
-			to.validate();
-		} else {
-			if (to != null) {
-				to.validate();
-			}
-		}
 		Asserts.notNull(content, "content");
 		content.validate();
+		if (to != null)
+			to.validate();
 	}
 }

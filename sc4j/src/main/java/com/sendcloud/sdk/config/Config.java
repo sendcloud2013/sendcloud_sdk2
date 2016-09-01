@@ -27,7 +27,7 @@ public class Config {
 	public static final int MAX_RECEIVERS = 100;
 	// 最大地址列表数
 	public static final int MAX_MAILLIST = 5;
-	// 附件大小
+	// 邮件内容大小
 	public static final int MAX_CONTENT_SIZE = 1024 * 1024;
 
 	static {
