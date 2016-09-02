@@ -20,14 +20,13 @@ import com.sendcloud.sdk.util.ResponseData;
 public class SendMail {
 
 	public static void send_common() throws Throwable {
-
 		MailAddressReceiver receiver = new MailAddressReceiver();
 		// 添加收件人
-		receiver.addTo("a@ifaxin.com");
+		receiver.addTo("a@ifaxin.com;b@ifaxin.com");
 		// 添加抄送
-		receiver.addCc("dada.chao.liu@qq.com");
+		receiver.addCc("c@ifaxin.com");
 		// 添加密送
-		receiver.addBcc("d@sendcloud.im");
+		receiver.addBcc("d@ifaxin.com");
 
 		MailBody body = new MailBody();
 		// 设置 From
@@ -40,7 +39,7 @@ public class SendMail {
 		body.setSubject("来自 SendCloud SDK 的邮件");
 		// 创建文件附件
 		body.addAttachments(new File("D:/1.png"));
-		body.addAttachments(new File("D:/1.png"));
+		body.addAttachments(new File("D:/2.png"));
 		//// 创建流附件
 		// body.addAttachments(new FileInputStream(new File("D:/ff.png")));
 
@@ -64,11 +63,11 @@ public class SendMail {
 	public static void send_common_advanced() throws Throwable {
 		MailAddressReceiver receiver = new MailAddressReceiver();
 		// 添加收件人
-		receiver.addTo("dada@ifaxin.com");
+		receiver.addTo("a@ifaxin.com");
 		// 添加抄送
-		receiver.addCc("dada.chao.liu@qq.com");
+		receiver.addCc("b@ifaxin.com");
 		// 添加密送
-		receiver.addBcc("d@sendcloud.im");
+		receiver.addBcc("c@ifaxin.com");
 
 		MailBody body = new MailBody();
 		// 设置 From
@@ -82,9 +81,10 @@ public class SendMail {
 		// 创建文件附件
 		body.addAttachments(new File("D:/1.png"));
 
+		// 配置 Xsmtpapi 扩展字段
 		List<String> toList = new ArrayList<String>();
-		toList.add("a@ifaxin.com");
-		toList.add("b@ifaxin.com");
+		toList.add("d@ifaxin.com");
+		toList.add("e@ifaxin.com");
 		List<String> moneyList = new ArrayList<String>();
 		moneyList.add("1000");
 		moneyList.add("2000");
@@ -102,7 +102,7 @@ public class SendMail {
 
 		TextContent content = new TextContent();
 		content.setContent_type(ScContentType.html);
-		content.setText("<html><p>helo world</p></html>");
+		content.setText("<html><p>亲爱的 %name%: </p> 您本月的支出为: %money% 元.</p></html>");
 
 		SendCloudMail mail = new SendCloudMail();
 		mail.setTo(receiver);
@@ -118,8 +118,6 @@ public class SendMail {
 	}
 
 	public static void send_template() throws Throwable {
-		MailAddressReceiver receiver = new MailAddressReceiver();
-
 		MailBody body = new MailBody();
 		// 设置 From
 		body.setFrom("sendcloud@sendcloud.org");
@@ -134,7 +132,7 @@ public class SendMail {
 
 		List<String> toList = new ArrayList<String>();
 		toList.add("a@ifaxin.com");
-		 toList.add("b@ifaxin.com");
+		toList.add("b@ifaxin.com");
 		List<String> moneyList = new ArrayList<String>();
 		moneyList.add("1000");
 		moneyList.add("3000");
@@ -155,7 +153,7 @@ public class SendMail {
 		content.setTemplateInvokeName("sendcloud_account_bind");
 
 		SendCloudMail mail = new SendCloudMail();
-		mail.setTo(receiver);
+		// 模板发送时, 必须使用 Xsmtpapi 来指明收件人; mail.setTo();
 		mail.setBody(body);
 		mail.setContent(content);
 
@@ -169,6 +167,7 @@ public class SendMail {
 
 	public static void send_with_addresslist() throws Throwable {
 		AddressListReceiver receiver = new AddressListReceiver();
+		// 设置地址列表
 		receiver.addTo("liubidatest@maillist.sendcloud.org");
 
 		MailBody body = new MailBody();
@@ -198,8 +197,9 @@ public class SendMail {
 	}
 
 	public static void main(String[] args) throws Throwable {
-		 send_template();
+		send_common();
 		// send_common_advanced();
-		send_with_addresslist();
+		// send_template();
+		// send_with_addresslist();
 	}
 }
